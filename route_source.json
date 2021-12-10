@@ -1,0 +1,18 @@
+{
+    "name": "inventory-connector-route",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "tasks.max": "1",
+        "database.hostname": "citus",
+        "database.port": "5432",
+        "database.user": "postgres",
+        "database.password": "password",
+        "database.dbname": "test_db",
+        "database.server.name": "sink_db",
+        "schema.include.list": "public",
+        "transforms": "route",
+        "transforms.route.type": "io.debezium.transforms.ContentBasedRouter",
+        "transforms.route.language": "jsr223.groovy",
+        "transforms.route.topic.expression": "value.after.name == 'toan' ? 'updates' : null"
+    }
+}
