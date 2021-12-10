@@ -10,9 +10,9 @@
         "database.dbname": "test_db",
         "database.server.name": "sink_db",
         "schema.include.list": "public",
-        "transforms": "route",
-        "transforms.route.type": "io.debezium.transforms.ContentBasedRouter",
-        "transforms.route.language": "jsr223.groovy",
-        "transforms.route.topic.expression": "value.after.name == 'toan' ? 'updates' : null"
+        "transforms": "Reroute",
+        "transforms.Reroute.type": "io.debezium.transforms.ByLogicalTableRouter",
+        "transforms.Reroute.topic.regex": "(.*).public.(.*)",
+        "transforms.Reroute.topic.replacement": "$2"
     }
 }
