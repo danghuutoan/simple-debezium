@@ -11,7 +11,7 @@
         "transforms.unwrap.route.by.field": "attribute_group",
         "transforms.AddPrefix.type": "org.apache.kafka.connect.transforms.RegexRouter",
         "transforms.AddPrefix.regex": ".*",
-        "transforms.AddPrefix.replacement": "acme_$0",
+        "transforms.AddPrefix.replacement": "eag_$0",
         "auto.create": "true",
         "insert.mode": "upsert",
         "delete.enabled": "true",
