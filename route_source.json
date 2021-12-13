@@ -16,7 +16,6 @@
         "transforms.Reroute.topic.replacement": "$2",
         "snapshot.mode": "never",
         "database.history.kafka.bootstrap.servers": "kafka:9092",
-        "database.history.kafka.topic": "schema-changes.attribute_group",
         "key.converter": "io.confluent.connect.avro.AvroConverter",
         "value.converter": "io.confluent.connect.avro.AvroConverter",
         "key.converter.schema.registry.url": "http://schema-registry:8081",
