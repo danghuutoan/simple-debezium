@@ -8,17 +8,7 @@ services:
       - ./ads.csv:/data/ads.csv
       - ./campaigns.csv:/data/campaigns.csv
       - ./companies.csv:/data/companies.csv
-    env_file:
-      - .env
-
-  sink_db:
-    image: debezium/example-postgres:${DEBEZIUM_VERSION}
-    ports:
-      - 5433:5432
-    volumes:
-      - ./ads.csv:/data/ads.csv
-      - ./campaigns.csv:/data/campaigns.csv
-      - ./companies.csv:/data/companies.csv
+      - postgres:/var/lib/postgresql
     env_file:
       - .env
 
@@ -44,6 +34,32 @@ services:
      - zookeeper
     environment:
      - ZOOKEEPER_CONNECT=zookeeper:2181
+     - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+     - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+     - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+     - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "localhost", "9092"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+  
+  schema-registry:
+    image: confluentinc/cp-schema-registry
+    ports:
+     - 8181:8181
+     - 8081:8081
+    environment:
+     - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
+     - SCHEMA_REGISTRY_DEBUG=true
+     - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+     - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
+     - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
+
+    links:
+     - zookeeper
+    depends_on:
+      - kafka
 
   connect:
     image: debezium/connect:${DEBEZIUM_VERSION}
@@ -54,13 +70,19 @@ services:
     links:
      - kafka
      - citus
-     - sink_db
+     - schema-registry
     environment:
      - BOOTSTRAP_SERVERS=kafka:9092
      - GROUP_ID=1
      - CONFIG_STORAGE_TOPIC=my_connect_configs
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
      - STATUS_STORAGE_TOPIC=my_connect_statuses
+     - KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
+     - VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
+     - INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+     - INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+     - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+     - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
 
 volumes:
     postgres:
