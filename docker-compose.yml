@@ -83,6 +83,7 @@ services:
      - INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+    #  - CLASSPATH=kafka/connect/debezium-connector-postgres/postgresql-42.2.22.jar
 
 volumes:
     postgres:
