@@ -49,3 +49,7 @@ ALTER TABLE ads ADD PRIMARY KEY (id, company_id);
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @sink.json
 curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json" http://localhost:8083/connectors/ -d @source.json
 ```
+
+```
+kafka-topics.sh --list --bootstrap-server kafka:9092
+```

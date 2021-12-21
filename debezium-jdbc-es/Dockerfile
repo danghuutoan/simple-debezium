@@ -21,3 +21,5 @@ RUN cd $KAFKA_CONNECT_POSTGRES_DIR &&\
     curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy-jsr223/3.0.4/groovy-jsr223-3.0.4.jar &&\
     curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy/3.0.4/groovy-3.0.4.jar && \
     curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy-json/3.0.4/groovy-json-3.0.4.jar
+
+RUN rm -rf /kafka/connect/debezium-connector-vitess && rm -rf /kafka/connect/debezium-connector-db2 

@@ -8,7 +8,8 @@ services:
       - ./ads.csv:/data/ads.csv
       - ./campaigns.csv:/data/campaigns.csv
       - ./companies.csv:/data/companies.csv
-      - postgres:/var/lib/postgresql
+      - ./postgres:/var/lib/postgresql
+      - ./entity_attribute_group.sql:/docker-entrypoint-initdb.d/z-entity_attribute_group.sql
     env_file:
       - .env
 
@@ -25,19 +26,28 @@ services:
      - 2181:2181
      - 2888:2888
      - 3888:3888
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "localhost", "2181"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
 
   kafka:
     image: debezium/kafka:${DEBEZIUM_VERSION}
     ports:
      - 9092:9092
+     - 9093:9093
     links:
      - zookeeper
+    networks:
+      - default
     environment:
-     - ZOOKEEPER_CONNECT=zookeeper:2181
-     - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
-     - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
-     - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
-     - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://:9093
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     healthcheck:
       test: ["CMD", "nc", "-vz", "localhost", "9092"]
       interval: 2s
@@ -67,6 +77,7 @@ services:
       context: debezium-jdbc-es
     ports:
      - 8083:8083
+    restart: on-failure:5
     links:
      - kafka
      - citus
@@ -84,6 +95,6 @@ services:
      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
     #  - CLASSPATH=kafka/connect/debezium-connector-postgres/postgresql-42.2.22.jar
-
-volumes:
-    postgres:
+    cpus: 6.0
+    volumes:
+      - ./:/app
