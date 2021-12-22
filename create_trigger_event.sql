@@ -16,3 +16,4 @@ END LOOP;
 END IF;
 END;
 $$ LANGUAGE plpgsql;
+CREATE EVENT TRIGGER log_ddl_info ON ddl_command_end EXECUTE PROCEDURE log_ddl();
