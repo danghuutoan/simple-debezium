@@ -4,12 +4,19 @@ r RECORD;
 BEGIN IF tg_tag = 'CREATE TABLE' THEN FOR r IN
 SELECT *
 FROM pg_event_trigger_ddl_commands() LOOP if r.command_tag = 'CREATE TABLE' then
-INSERT INTO ddl_history (ddl_date, ddl_tag, object_name, command_tag)
+INSERT INTO ddl_history (
+        ddl_date,
+        ddl_tag,
+        object_name,
+        command_tag,
+        in_extension
+    )
 VALUES (
         statement_timestamp(),
         tg_tag,
         r.object_identity,
-        r.command_tag
+        r.command_tag,
+        r.in_extension
     );
 end if;
 END LOOP;
