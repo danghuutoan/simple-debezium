@@ -5,8 +5,11 @@ BEGIN IF tg_tag = 'CREATE TABLE' THEN FOR r IN
 SELECT *
 FROM pg_event_trigger_ddl_commands() LOOP if r.command_tag = 'CREATE TABLE'
     and (
-        right(r.object_identity, 5) in ('plit"', 'split')
-    ) then
+        substring(
+            r.object_identity
+            from '(.+)_([0-9]+)'
+        )
+    ) is NULL then
 INSERT INTO ddl_history (
         ddl_date,
         ddl_tag,
@@ -21,7 +24,7 @@ VALUES (
         r.command_tag,
         r.in_extension
     );
-if left(r.object_identity, 4) in ('eag_', '"eag') then PERFORM create_distributed_table(r.object_identity, 'entity_id');
+if left(r.object_identity, 11) in ('public.eag_', 'public."eag') then PERFORM create_distributed_table(r.object_identity, 'entity_id');
 end if;
 end if;
 END LOOP;
