@@ -53,6 +53,8 @@ services:
       interval: 2s
       timeout: 2s
       retries: 15
+    depends_on:
+      - zookeeper
   
   schema-registry:
     image: confluentinc/cp-schema-registry
@@ -75,8 +77,11 @@ services:
     image: debezium/connect:${DEBEZIUM_VERSION}
     build:
       context: debezium-jdbc-es
+      args:
+        JMX_AGENT_VERSION: 0.15.0
     ports:
      - 8083:8083
+     - 1976:1976
     restart: on-failure:5
     links:
      - kafka
@@ -94,7 +99,34 @@ services:
      - INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
      - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
      - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
+     - KAFKA_OPTS=-javaagent:/kafka/etc/jmx_prometheus_javaagent.jar=8080:/kafka/etc/config.yml
+     - JMXHOST=localhost
+     - JMXPORT=1976
     #  - CLASSPATH=kafka/connect/debezium-connector-postgres/postgresql-42.2.22.jar
     cpus: 6.0
     volumes:
       - ./:/app
+    depends_on:
+      - kafka
+      - schema-registry
+
+  prometheus:
+    build:
+      context: debezium-prometheus
+      args:
+        PROMETHEUS_VERSION: v2.26.0
+    ports:
+     - 9090:9090
+    links:
+     - connect
+  grafana:
+    build:
+      context: debezium-grafana
+      args:
+        GRAFANA_VERSION: 7.5.5
+    ports:
+     - 3000:3000
+    links:
+     - prometheus
+    environment:
+     - DS_PROMETHEUS=prometheus

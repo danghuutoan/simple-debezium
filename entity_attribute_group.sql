@@ -1,5 +1,4 @@
-CREATE DATABASE sink_db;
-CREATE TABLE entity_attribute_group (
+CREATE TABLE IF NOT EXISTS entity_attribute_group (
     entity_id VARCHAR(28) NOT NULL,
     attribute_group VARCHAR(28) NOT NULL,
     attribute_version INT NOT NULL,
@@ -31,3 +30,4 @@ VALUES (
         1,
         ('{ "key": "value" }')
     );
+CREATE DATABASE sink_db;
