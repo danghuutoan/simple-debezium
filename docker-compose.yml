@@ -8,7 +8,7 @@ services:
       - ./ads.csv:/data/ads.csv
       - ./campaigns.csv:/data/campaigns.csv
       - ./companies.csv:/data/companies.csv
-      - ./postgres:/var/lib/postgresql
+      - ./postgres_6:/var/lib/postgresql
       - ./entity_attribute_group.sql:/docker-entrypoint-initdb.d/z-entity_attribute_group.sql
     env_file:
       - .env
@@ -130,3 +130,15 @@ services:
      - prometheus
     environment:
      - DS_PROMETHEUS=prometheus
+
+  kafka-manager:
+    image: sheepkiller/kafka-manager:latest
+    ports:
+      - "9000:9000"
+    links:
+      - zookeeper
+      - kafka
+    environment:
+      ZK_HOSTS: zookeeper:2181
+      APPLICATION_SECRET: letmein
+      KM_ARGS: -Djava.net.preferIPv4Stack=true

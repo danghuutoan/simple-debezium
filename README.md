@@ -53,3 +53,14 @@ curl -i -X POST -H "Accept:application/json" -H  "Content-Type:application/json"
 ```
 kafka-topics.sh --list --bootstrap-server kafka:9092
 ```
+
+
+insert into entity_attribute_group (
+    entity_id, attribute_group, attribute_version, json_value
+)
+select
+    left(md5(i::text), 10),
+    left(md5(random()::text), 28),
+    i,
+    '{"key": "value"}'
+from generate_series(1, 1000000) s(i)
