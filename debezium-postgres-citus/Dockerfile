@@ -1,0 +1,1 @@
+FROM citusdata/citus:10.2

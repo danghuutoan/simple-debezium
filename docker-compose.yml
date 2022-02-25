@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   citus:
-    image: debezium/example-postgres:${DEBEZIUM_VERSION}
+    image: citusdata/citus:10.2
     ports:
       - 5432:5432
     volumes:
