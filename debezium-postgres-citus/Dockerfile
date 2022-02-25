@@ -5,3 +5,4 @@ RUN apt-get update && apt-get install -f -y software-properties-common build-ess
 
 
 RUN apt-get install -y postgresql-14-wal2json
+COPY ./postgres.conf /etc/postgresql/postgresql.conf

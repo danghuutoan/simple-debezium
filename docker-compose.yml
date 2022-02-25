@@ -6,13 +6,15 @@ services:
       context: ./debezium-postgres-citus
     ports:
       - 5432:5432
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - ./ads.csv:/data/ads.csv
       - ./campaigns.csv:/data/campaigns.csv
       - ./companies.csv:/data/companies.csv
       - ./postgres_6:/var/lib/postgresql
       - ./entity_attribute_group.sql:/docker-entrypoint-initdb.d/z-entity_attribute_group.sql
-      - ./postgres.conf:/etc/postgresql/postgresql.conf
+      - ./postgres.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
     env_file:
       - .env
 
