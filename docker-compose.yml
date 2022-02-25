@@ -18,6 +18,24 @@ services:
     env_file:
       - .env
 
+  citus-1:
+    image: citusdata/citus:10.2
+    ports:
+      - 5433:5432
+    volumes:
+      - ./postgres-1:/var/lib/postgresql
+    env_file:
+      - .env
+
+  citus-2:
+    image: citusdata/citus:10.2
+    ports:
+      - 5434:5432
+    volumes:
+      - ./postgres-2:/var/lib/postgresql
+    env_file:
+      - .env
+
   pgadmin:
     image: dpage/pgadmin4
     ports:
