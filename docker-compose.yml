@@ -8,13 +8,17 @@ services:
       - 5432:5432
     environment:
       - PGDATA=/var/lib/postgresql/data/pgdata
+    command:
+      - "postgres"
+      - "-c"
+      - "config_file=/etc/postgresql/postgresql.conf"
     volumes:
       - ./ads.csv:/data/ads.csv
       - ./campaigns.csv:/data/campaigns.csv
       - ./companies.csv:/data/companies.csv
-      - ./postgres_6:/var/lib/postgresql
+      - postgres:/var/lib/postgresql/data
       - ./entity_attribute_group.sql:/docker-entrypoint-initdb.d/z-entity_attribute_group.sql
-      - ./postgres.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
+      # - ./postgres.conf:/var/lib/postgresql/data/pgdata/postgresql.conf
     env_file:
       - .env
 
@@ -22,8 +26,10 @@ services:
     image: citusdata/citus:10.2
     ports:
       - 5433:5432
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - ./postgres-1:/var/lib/postgresql
+      - postgres-1:/var/lib/postgresql/data
     env_file:
       - .env
 
@@ -31,8 +37,10 @@ services:
     image: citusdata/citus:10.2
     ports:
       - 5434:5432
+    environment:
+      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
-      - ./postgres-2:/var/lib/postgresql
+      - postgres-2:/var/lib/postgresql/data
     env_file:
       - .env
 
@@ -165,3 +173,8 @@ services:
       ZK_HOSTS: zookeeper:2181
       APPLICATION_SECRET: letmein
       KM_ARGS: -Djava.net.preferIPv4Stack=true
+
+volumes:
+  postgres:
+  postgres-1:
+  postgres-2:

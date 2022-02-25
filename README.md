@@ -64,3 +64,13 @@ select
     i,
     '{"key": "value"}'
 from generate_series(1, 1000000) s(i)
+
+move shards out of master node
+citus_drain_node(node_name, nodeport)
+
+excute on worker
+SELECT * from citus_add_node('worker-101', 5432);
+SELECT * from citus_add_node('worker-101', 5432);
+
+verify
+SELECT * FROM citus_get_active_worker_nodes();

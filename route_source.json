@@ -19,6 +19,8 @@
         "value.converter.schema.registry.url": "http://schema-registry:8081",
         "topic.creation.default.replication.factor": 1,  
         "topic.creation.default.partitions": 10,
+        "plugin.name":"wal2json",
+        "slot.name": "wal2json",
         "snapshot.mode": "never",
         "time.precision.mode":"connect"
     }
