@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   citus:
-    image: citusdata/citus:10.2
+    image: quay.io/debezium/postgres:9.6
     ports:
       - 5432:5432
     volumes:
@@ -56,22 +56,23 @@ services:
     depends_on:
       - zookeeper
   
-  schema-registry:
-    image: confluentinc/cp-schema-registry
-    ports:
-     - 8181:8181
-     - 8081:8081
-    environment:
-     - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
-     - SCHEMA_REGISTRY_DEBUG=true
-     - SCHEMA_REGISTRY_HOST_NAME=schema-registry
-     - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
-     - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
+  # schema-registry:
+  #   platform: linux/amd64
+  #   image: confluentinc/cp-schema-registry
+  #   ports:
+  #    - 8181:8181
+  #    - 8081:8081
+  #   environment:
+  #    - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
+  #    - SCHEMA_REGISTRY_DEBUG=true
+  #    - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+  #    - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
+  #    - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
 
-    links:
-     - zookeeper
-    depends_on:
-      - kafka
+  #   links:
+  #    - zookeeper
+  #   depends_on:
+  #     - kafka
 
   connect:
     image: debezium/connect:${DEBEZIUM_VERSION}
@@ -86,19 +87,15 @@ services:
     links:
      - kafka
      - citus
-     - schema-registry
+
     environment:
      - BOOTSTRAP_SERVERS=kafka:9092
      - GROUP_ID=1
      - CONFIG_STORAGE_TOPIC=my_connect_configs
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
      - STATUS_STORAGE_TOPIC=my_connect_statuses
-     - KEY_CONVERTER=io.confluent.connect.avro.AvroConverter
-     - VALUE_CONVERTER=io.confluent.connect.avro.AvroConverter
      - INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
      - INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
-     - CONNECT_KEY_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
-     - CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL=http://schema-registry:8081
      - KAFKA_OPTS=-javaagent:/kafka/etc/jmx_prometheus_javaagent.jar=8080:/kafka/etc/config.yml
      - JMXHOST=localhost
      - JMXPORT=1976
@@ -108,37 +105,36 @@ services:
       - ./:/app
     depends_on:
       - kafka
-      - schema-registry
 
-  prometheus:
-    build:
-      context: debezium-prometheus
-      args:
-        PROMETHEUS_VERSION: v2.26.0
-    ports:
-     - 9090:9090
-    links:
-     - connect
-  grafana:
-    build:
-      context: debezium-grafana
-      args:
-        GRAFANA_VERSION: 7.5.5
-    ports:
-     - 3000:3000
-    links:
-     - prometheus
-    environment:
-     - DS_PROMETHEUS=prometheus
+  # prometheus:
+  #   build:
+  #     context: debezium-prometheus
+  #     args:
+  #       PROMETHEUS_VERSION: v2.26.0
+  #   ports:
+  #    - 9090:9090
+  #   links:
+  #    - connect
+  # grafana:
+  #   build:
+  #     context: debezium-grafana
+  #     args:
+  #       GRAFANA_VERSION: 7.5.5
+  #   ports:
+  #    - 3000:3000
+  #   links:
+  #    - prometheus
+  #   environment:
+  #    - DS_PROMETHEUS=prometheus
 
-  kafka-manager:
-    image: sheepkiller/kafka-manager:latest
-    ports:
-      - "9000:9000"
-    links:
-      - zookeeper
-      - kafka
-    environment:
-      ZK_HOSTS: zookeeper:2181
-      APPLICATION_SECRET: letmein
-      KM_ARGS: -Djava.net.preferIPv4Stack=true
+  # kafka-manager:
+  #   image: sheepkiller/kafka-manager:latest
+  #   ports:
+  #     - "9000:9000"
+  #   links:
+  #     - zookeeper
+  #     - kafka
+  #   environment:
+  #     ZK_HOSTS: zookeeper:2181
+  #     APPLICATION_SECRET: letmein
+  #     KM_ARGS: -Djava.net.preferIPv4Stack=true

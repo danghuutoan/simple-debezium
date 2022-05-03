@@ -64,3 +64,6 @@ select
     i,
     '{"key": "value"}'
 from generate_series(1, 1000000) s(i)
+
+
+kafka-console-consumer.sh --bootstrap-server kafka:9092 --property print.key=true --from-beginning --topic sink_db.public.entity_attribute_group 

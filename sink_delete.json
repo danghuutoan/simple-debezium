@@ -1,0 +1,22 @@
+{
+    "name": "jdbc-sink-delete",
+    "config": {
+        "connector.class": "io.confluent.connect.jdbc.JdbcSinkConnector",
+        "tasks.max": "1",
+        "topics": "sink_db.public.entity_attribute_group",
+        "connection.url": "jdbc:postgresql://citus:5432/sink_db?user=postgres&password=password",
+        "transforms": "filter,unwrap",
+        "transforms.unwrap.type": "io.debezium.transforms.ExtractNewRecordState",
+        "transforms.unwrap.drop.tombstones": "false",
+        "transforms.unwrap.delete.handling.mode":"rewrite",
+        "transforms.filter.type": "io.debezium.transforms.Filter",
+        "transforms.filter.language":"jsr223.groovy",
+        "transforms.filter.condition":"value.op == 'd'",
+        "auto.create": "true",
+        "insert.mode": "upsert",
+        "pk.fields": "entity_id,attribute_group",
+        "pk.mode": "record_key",
+        "database.history.kafka.bootstrap.servers": "kafka:9092",
+        "database.history.kafka.topic": "schema-changes.attribute_group"
+    }
+}

@@ -12,8 +12,12 @@ ARG KAFKA_ELASTICSEARCH_VERSION=5.3.2
 # Deploy Kafka Connect JDBC
 RUN mkdir $KAFKA_CONNECT_JDBC_DIR && cd $KAFKA_CONNECT_JDBC_DIR &&\
 	curl -sO https://packages.confluent.io/maven/io/confluent/kafka-connect-jdbc/$KAFKA_JDBC_VERSION/kafka-connect-jdbc-$KAFKA_JDBC_VERSION.jar && \
-    curl -sO https://jdbc.postgresql.org/download/postgresql-$POSTGRES_VERSION.jar
+    curl -sO https://jdbc.postgresql.org/download/postgresql-$POSTGRES_VERSION.jar && \
+    curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy-jsr223/3.0.4/groovy-jsr223-3.0.4.jar &&\
+    curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy/3.0.4/groovy-3.0.4.jar && \
+    curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy-json/3.0.4/groovy-json-3.0.4.jar
 
+COPY ./ExtractNewRecordState.jar $KAFKA_CONNECT_JDBC_DIR/ExtractNewRecordState.jar
 
 RUN cd $KAFKA_CONNECT_POSTGRES_DIR &&\
 	curl -sO https://repo1.maven.org/maven2/io/debezium/debezium-scripting/1.7.1.Final/debezium-scripting-1.7.1.Final.jar && \

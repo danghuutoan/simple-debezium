@@ -1,0 +1,21 @@
+{
+    "name": "inventory-connector-1",
+    "config": {
+        "connector.class": "io.debezium.connector.postgresql.PostgresConnector",
+        "tasks.max": "1",
+        "database.hostname": "citus-1",
+        "database.port": "5432",
+        "database.user": "postgres",
+        "database.password": "password",
+        "database.dbname": "test",
+        "database.server.name": "sink_db",
+        "schema.include.list": "public",
+        "topic.creation.default.replication.factor": 1,  
+        "topic.creation.default.partitions": 10,  
+        "topic.creation.default.cleanup.policy": "compact",  
+        "topic.creation.default.compression.type": "lz4",
+        "plugin.name":"pgoutput",
+        "snapshot.mode": "never",
+        "slot.name": "citus_1"
+    }
+}
