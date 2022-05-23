@@ -1,10 +1,10 @@
 version: "3.9"
 services:
   mysql:
-    image: mysql:5.7
+    image: quay.io/debezium/example-mysql:1.9
     restart: always
     environment:
-      MYSQL_DATABASE: 'db'
+      MYSQL_DATABASE: 'public'
       MYSQL_ROOT_PASSWORD: example
       MYSQL_USER: 'toan'
     ports:
@@ -74,18 +74,18 @@ services:
     depends_on:
       - zookeeper
   
-  # schema-registry:
-  #   platform: linux/amd64
-  #   image: confluentinc/cp-schema-registry
-  #   ports:
-  #    - 8181:8181
-  #    - 8081:8081
-  #   environment:
-  #    - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
-  #    - SCHEMA_REGISTRY_DEBUG=true
-  #    - SCHEMA_REGISTRY_HOST_NAME=schema-registry
-  #    - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
-  #    - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
+  schema-registry:
+    platform: linux/amd64
+    image: confluentinc/cp-schema-registry
+    ports:
+     - 8181:8181
+     - 8081:8081
+    environment:
+     - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
+     - SCHEMA_REGISTRY_DEBUG=true
+     - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+     - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
+     - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
 
   #   links:
   #    - zookeeper
