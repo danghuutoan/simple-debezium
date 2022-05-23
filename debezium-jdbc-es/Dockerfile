@@ -1,4 +1,4 @@
-FROM debezium/connect:1.8
+FROM debezium/connect:1.9
 ENV KAFKA_CONNECT_JDBC_DIR=$KAFKA_CONNECT_PLUGINS_DIR/kafka-connect-jdbc \
     KAFKA_CONNECT_ES_DIR=$KAFKA_CONNECT_PLUGINS_DIR/kafka-connect-elasticsearch \
     KAFKA_CONNECT_POSTGRES_DIR=$KAFKA_CONNECT_PLUGINS_DIR/debezium-connector-postgres
@@ -25,7 +25,7 @@ RUN cd $KAFKA_CONNECT_POSTGRES_DIR &&\
     curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy/3.0.4/groovy-3.0.4.jar && \
     curl -sO https://repo1.maven.org/maven2/org/codehaus/groovy/groovy-json/3.0.4/groovy-json-3.0.4.jar
 
-ARG JMX_AGENT_VERSION
+ARG JMX_AGENT_VERSION=0.9
 RUN mkdir /kafka/etc && cd /kafka/etc &&\
         curl -so jmx_prometheus_javaagent.jar \
         https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/$JMX_AGENT_VERSION/jmx_prometheus_javaagent-$JMX_AGENT_VERSION.jar

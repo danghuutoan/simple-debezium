@@ -1,5 +1,23 @@
 version: "3.9"
 services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_USER: 'toan'
+    ports:
+      - 3306:3306
+    volumes:
+      - my-db:/var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
   citus:
     image: quay.io/debezium/postgres:9.6
     ports:
@@ -138,3 +156,6 @@ services:
   #     ZK_HOSTS: zookeeper:2181
   #     APPLICATION_SECRET: letmein
   #     KM_ARGS: -Djava.net.preferIPv4Stack=true
+
+volumes:
+  my-db:
