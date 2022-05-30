@@ -7,6 +7,7 @@ services:
       MYSQL_DATABASE: 'public'
       MYSQL_ROOT_PASSWORD: example
       MYSQL_USER: 'toan'
+    command: mysqld --sql_mode="ONLY_FULL_GROUP_BY,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
     ports:
       - 3306:3306
     volumes:
@@ -93,7 +94,6 @@ services:
   #     - kafka
 
   connect:
-    image: debezium/connect:${DEBEZIUM_VERSION}
     build:
       context: debezium-jdbc-es
       args:
@@ -119,8 +119,6 @@ services:
      - JMXPORT=1976
     #  - CLASSPATH=kafka/connect/debezium-connector-postgres/postgresql-42.2.22.jar
     cpus: 6.0
-    volumes:
-      - ./:/app
     depends_on:
       - kafka
 
