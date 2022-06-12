@@ -1,2 +1,0 @@
-CREATE TABLE public.dbz_signal (id varchar(64), type varchar(32), data varchar(2048))
-INSERT INTO public.dbz_signal VALUES ('signal-1', 'execute-snapshot', '{"data-collections": ["public.entity_attribute_group"]}')
