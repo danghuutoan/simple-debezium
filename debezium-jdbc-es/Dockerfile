@@ -55,3 +55,7 @@ FROM confluentinc/cp-kafka-connect-base:6.2.4
 RUN confluent-hub install --no-prompt debezium/debezium-connector-mysql:1.9.2.Final
 RUN confluent-hub install --no-prompt debezium/debezium-connector-postgresql:1.9.2.Final
 RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:10.5.0
+
+COPY ./DebeziumAllTimestampFieldsToAvroTimestampConverter-1.0.5.jar /usr/share/confluent-hub-components/debezium-debezium-connector-mysql/DebeziumAllTimestampFieldsToAvroTimestampConverter-1.0.5.jar
+COPY ./DebeziumNullValueConverter-1.0.0.jar /usr/share/confluent-hub-components/debezium-debezium-connector-mysql/DebeziumNullValueConverter-1.0.0.jar
+COPY ./SetDataTypeToOptional-1.0-SNAPSHOT.jar /usr/share/confluent-hub-components/debezium-debezium-connector-mysql/SetDataTypeToOptional-1.0-SNAPSHOT.jar

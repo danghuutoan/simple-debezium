@@ -1,8 +1,8 @@
 {
-    "name": "inventory-connector-new-16", 
+    "name": "inventory-connector-new-17", 
     "config": {
         "connector.class": "io.debezium.connector.mysql.MySqlConnector", 
-        "database.hostname": "192.168.1.4", 
+        "database.hostname": "192.168.1.5", 
         "database.port": "3306", 
         "database.user": "root", 
         "database.password": "example", 
@@ -10,7 +10,7 @@
         "database.server.name": "sink_db", 
         "database.include.list": "public",
         "table.include.list": "public.user_account",
-        "database.history.kafka.bootstrap.servers": "192.168.1.4:9093", 
+        "database.history.kafka.bootstrap.servers": "192.168.1.5:9093", 
         "database.history.kafka.topic": "dbhistory.fullfillment_new-15",
         "time.precision.mode":"connect",
         "errors.log.enable": "true",
@@ -33,7 +33,7 @@
         "transforms.unwrap.drop.tombstones": "false",
         "key.converter": "io.confluent.connect.avro.AvroConverter",
         "value.converter": "io.confluent.connect.avro.AvroConverter",
-        "key.converter.schema.registry.url": "http://192.168.1.4:8081",
-        "value.converter.schema.registry.url": "http://192.168.1.4:8081"
+        "key.converter.schema.registry.url": "http://192.168.1.5:8081",
+        "value.converter.schema.registry.url": "http://192.168.1.5:8081"
     }
 }
