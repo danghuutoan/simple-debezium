@@ -1,97 +1,58 @@
 version: "3.9"
 services:
-  # mysql:
-  #   image: quay.io/debezium/example-mysql:1.9
-  #   restart: always
-  #   environment:
-  #     MYSQL_DATABASE: 'public'
-  #     MYSQL_ROOT_PASSWORD: example
-  #     MYSQL_USER: 'toan'
-  #   command: mysqld --sql_mode="ONLY_FULL_GROUP_BY,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION"
-  #   ports:
-  #     - 3306:3306
-  #   volumes:
-  #     - my-db:/var/lib/mysql
+  zookeeper:
+    image: debezium/zookeeper:${DEBEZIUM_VERSION}
+    ports:
+     - 2181:2181
+     - 2888:2888
+     - 3888:3888
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "localhost", "2181"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
 
-  # adminer:
-  #   image: adminer
-  #   restart: always
-  #   ports:
-  #     - 8080:8080
-
-  # citus:
-  #   image: quay.io/debezium/postgres:9.6
-  #   ports:
-  #     - 5432:5432
-  #   volumes:
-  #     - ./ads.csv:/data/ads.csv
-  #     - ./campaigns.csv:/data/campaigns.csv
-  #     - ./companies.csv:/data/companies.csv
-  #     - ./postgres_6:/var/lib/postgresql
-  #     - ./entity_attribute_group.sql:/docker-entrypoint-initdb.d/z-entity_attribute_group.sql
-  #   env_file:
-  #     - .env
-
-  # pgadmin:
-  #   image: dpage/pgadmin4
-  #   ports:
-  #     - 5050:80
-  #   env_file:
-  #     - .env
-
-  # zookeeper:
-  #   image: debezium/zookeeper:${DEBEZIUM_VERSION}
-  #   ports:
-  #    - 2181:2181
-  #    - 2888:2888
-  #    - 3888:3888
-  #   healthcheck:
-  #     test: ["CMD", "nc", "-vz", "localhost", "2181"]
-  #     interval: 2s
-  #     timeout: 2s
-  #     retries: 15
-
-  # kafka:
-  #   image: debezium/kafka:${DEBEZIUM_VERSION}
-  #   ports:
-  #    - 9092:9092
-  #    - 9093:9093
-  #   links:
-  #    - zookeeper
-  #   networks:
-  #     - default
-  #   environment:
-  #     ZOOKEEPER_CONNECT: "zookeeper:2181"
-  #     KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://:9093
-  #     KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9093
-  #     KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-  #     KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
-  #     KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-  #   healthcheck:
-  #     test: ["CMD", "nc", "-vz", "localhost", "9092"]
-  #     interval: 2s
-  #     timeout: 2s
-  #     retries: 15
-  #   depends_on:
-  #     - zookeeper
+  kafka:
+    image: debezium/kafka:${DEBEZIUM_VERSION}
+    ports:
+     - 9092:9092
+     - 9093:9093
+    links:
+     - zookeeper
+    networks:
+      - default
+    environment:
+      ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://:9092,OUTSIDE://:9093
+      KAFKA_LISTENERS: INSIDE://:9092,OUTSIDE://:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: ["CMD", "nc", "-vz", "localhost", "9092"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+    depends_on:
+      - zookeeper
   
-  # schema-registry:
-  #   platform: linux/amd64
-  #   image: confluentinc/cp-schema-registry
-  #   ports:
-  #    - 8181:8181
-  #    - 8081:8081
-  #   environment:
-  #    - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
-  #    - SCHEMA_REGISTRY_DEBUG=true
-  #    - SCHEMA_REGISTRY_HOST_NAME=schema-registry
-  #    - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
-  #    - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
+  schema-registry:
+    platform: linux/amd64
+    image: confluentinc/cp-schema-registry
+    ports:
+     - 8181:8181
+     - 8081:8081
+    environment:
+     - KAFKA_REST_ZOOKEEPER_CONNECT=zookeeper:2181
+     - SCHEMA_REGISTRY_DEBUG=true
+     - SCHEMA_REGISTRY_HOST_NAME=schema-registry
+     - SCHEMA_REGISTRY_LISTENERS=http://schema-registry:8081
+     - SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS=PLAINTEXT://kafka:9092
 
-  #   links:
-  #    - zookeeper
-  #   depends_on:
-  #     - kafka
+    links:
+     - zookeeper
+    depends_on:
+      - kafka
 
   connect:
     platform: linux/amd64
