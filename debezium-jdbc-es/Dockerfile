@@ -8,3 +8,11 @@ RUN cd /usr/share/confluent-hub-components && \
     tar -xf kafka-connect-hive-3.0.1-2.5.0-all.tar.gz && \
     rm kafka-connect-hive-3.0.1-2.5.0-all.tar.gz
 
+USER root
+# RUN yum install -y zulu8-ca-jdk-headless zulu8-ca-jre-headless
+
+RUN yum update -y &&  yum install -y java-1.8.0-openjdk
+RUN rm -rf /usr/lib/jvm/zulu11/bin/java
+RUN update-alternatives --remove java /usr/lib/jvm/zulu11/bin/java
+USER appuser
+# RUN update-alternatives --config java

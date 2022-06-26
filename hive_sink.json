@@ -1,0 +1,13 @@
+{
+    "name": "hive_sink",
+    "config": {
+        "connector.class":"com.landoop.streamreactor.connect.hive.sink.HiveSinkConnector",
+        "tasks.max":"1",
+        "topics":"orders",
+        "connect.hive.kcql":"INSERT INTO orders SELECT * FROM orders AUTOCREATE PARTITION_BY state WITH_FLUSH_INTERVAL = 10",
+        "connect.hive.database.name":"lenses",
+        "connect.hive.metastore":"thrift",
+        "connect.hive.metastore.uris":"thrift://192.168.1.2:9083",
+        "connect.hive.fs.defaultFS":"hdfs://192.168.1.2:8020"
+    }
+}

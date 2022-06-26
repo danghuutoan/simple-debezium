@@ -63,6 +63,7 @@ services:
     ports:
      - 8083:8083
      - 1976:1976
+     - 5005:5005
     restart: on-failure:5
     # links:
     #  - kafka
@@ -76,6 +77,7 @@ services:
       - STATUS_STORAGE_TOPIC=my_connect_statuses
       - INTERNAL_KEY_CONVERTER=org.apache.kafka.connect.json.JsonConverter
       - INTERNAL_VALUE_CONVERTER=org.apache.kafka.connect.json.JsonConverter
+      - KAFKA_OPTS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=127.0.0.1:5005
       - KAFKA_HEAP_OPTS= -Xmx4G -Xms4G
       - CONNECT_PLUGIN_PATH=/usr/share/confluent-hub-components,/data/connect-jars
       - CONNECT_BOOTSTRAP_SERVERS=kafka:9093
