@@ -3,11 +3,15 @@
     "config": {
         "connector.class":"com.landoop.streamreactor.connect.hive.sink.HiveSinkConnector",
         "tasks.max":"1",
-        "topics":"orders",
-        "connect.hive.kcql":"INSERT INTO orders SELECT * FROM orders AUTOCREATE PARTITION_BY state WITH_FLUSH_INTERVAL = 10",
-        "connect.hive.database.name":"lenses",
+        "topics":"inventory.public.customers",
+        "connect.hive.kcql":"INSERT INTO customers SELECT * FROM inventory.public.customers AUTOCREATE PARTITION_BY state WITH_FLUSH_INTERVAL = 10",
+        "connect.hive.database.name":"hive_connect",
         "connect.hive.metastore":"thrift",
-        "connect.hive.metastore.uris":"thrift://192.168.1.2:9083",
-        "connect.hive.fs.defaultFS":"hdfs://192.168.1.2:8020"
+        "connect.hive.metastore.uris":"thrift://hive-metastore:9083",
+        "connect.hive.fs.defaultFS":"hdfs://namenode:8020",
+        "key.converter": "io.confluent.connect.avro.AvroConverter",
+        "value.converter": "io.confluent.connect.avro.AvroConverter",
+        "key.converter.schema.registry.url": "http://schema-registry:8081",
+        "value.converter.schema.registry.url": "http://schema-registry:8081"
     }
 }
