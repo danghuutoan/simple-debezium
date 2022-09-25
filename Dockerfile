@@ -1,53 +1,18 @@
-FROM bde2020/hadoop-base:2.0.0-hadoop2.7.4-java8
+FROM confluentinc/cp-kafka-connect-base:6.2.4
 
-MAINTAINER Yiannis Mouchakis <gmouchakis@iit.demokritos.gr>
-MAINTAINER Ivan Ermilov <ivan.s.ermilov@gmail.com>
+RUN confluent-hub install --no-prompt debezium/debezium-connector-mysql:1.9.2.Final
+RUN confluent-hub install --no-prompt debezium/debezium-connector-postgresql:1.9.2.Final
+RUN confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:10.5.0
+RUN cd /usr/share/confluent-hub-components && \
+    wget https://github.com/lensesio/stream-reactor/releases/download/3.0.1/kafka-connect-hive-3.0.1-2.5.0-all.tar.gz && \
+    tar -xf kafka-connect-hive-3.0.1-2.5.0-all.tar.gz && \
+    rm kafka-connect-hive-3.0.1-2.5.0-all.tar.gz
 
-# Allow buildtime config of HIVE_VERSION
-ARG HIVE_VERSION
-# Set HIVE_VERSION from arg if provided at build, env if provided at run, or default
-# https://docs.docker.com/engine/reference/builder/#using-arg-variables
-# https://docs.docker.com/engine/reference/builder/#environment-replacement
-ENV HIVE_VERSION=${HIVE_VERSION:-2.3.2}
+# USER root
+# RUN yum install -y zulu8-ca-jdk-headless zulu8-ca-jre-headless
 
-ENV HIVE_HOME /opt/hive
-ENV PATH $HIVE_HOME/bin:$PATH
-ENV HADOOP_HOME /opt/hadoop-$HADOOP_VERSION
-
-WORKDIR /opt
-
-#Install Hive and PostgreSQL JDBC
-RUN apt-get update && apt-get install -y wget procps && \
-	wget https://archive.apache.org/dist/hive/hive-$HIVE_VERSION/apache-hive-$HIVE_VERSION-bin.tar.gz && \
-	tar -xzvf apache-hive-$HIVE_VERSION-bin.tar.gz && \
-	mv apache-hive-$HIVE_VERSION-bin hive && \
-	wget https://jdbc.postgresql.org/download/postgresql-9.4.1212.jar -O $HIVE_HOME/lib/postgresql-jdbc.jar && \
-	rm apache-hive-$HIVE_VERSION-bin.tar.gz && \
-	apt-get --purge remove -y wget && \
-	apt-get clean && \
-	rm -rf /var/lib/apt/lists/*
-
-
-#Spark should be compiled with Hive to be able to use it
-#hive-site.xml should be copied to $SPARK_HOME/conf folder
-
-#Custom configuration goes here
-ADD conf/hive-site.xml $HIVE_HOME/conf
-ADD conf/beeline-log4j2.properties $HIVE_HOME/conf
-ADD conf/hive-env.sh $HIVE_HOME/conf
-ADD conf/hive-exec-log4j2.properties $HIVE_HOME/conf
-ADD conf/hive-log4j2.properties $HIVE_HOME/conf
-ADD conf/ivysettings.xml $HIVE_HOME/conf
-ADD conf/llap-daemon-log4j2.properties $HIVE_HOME/conf
-
-COPY startup.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/startup.sh
-
-COPY entrypoint.sh /usr/local/bin/
-RUN chmod +x /usr/local/bin/entrypoint.sh
-
-EXPOSE 10000
-EXPOSE 10002
-
-ENTRYPOINT ["entrypoint.sh"]
-CMD startup.sh
+# RUN yum update -y &&  yum install -y java-1.8.0-openjdk
+# RUN rm -rf /usr/lib/jvm/zulu11/bin/java
+# RUN update-alternatives --remove java /usr/lib/jvm/zulu11/bin/java
+USER appuser
+# RUN update-alternatives --config java
