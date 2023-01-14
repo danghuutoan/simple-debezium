@@ -1,0 +1,11 @@
+ kafka-topics --create --topic TextLinesTopic \
+                     --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
+ kafka-topics --create --topic UppercasedTextLinesTopic \
+                     --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
+ kafka-topics --create --topic OriginalAndUppercasedTopic \
+                   --partitions 1 --replication-factor 1 --bootstrap-server localhost:9092
+
+bin/kafka-console-consumer --topic UppercasedTextLinesTopic --from-beginning \
+                              --bootstrap-server localhost:9092
+bin/kafka-console-consumer --topic OriginalAndUppercasedTopic --from-beginning \
+                              --bootstrap-server localhost:9092 --property print.key=true

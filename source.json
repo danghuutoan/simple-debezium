@@ -1,0 +1,15 @@
+{
+    "name": "fulfillment-connector",  
+    "config": {
+      "connector.class": "io.debezium.connector.postgresql.PostgresConnector", 
+      "database.hostname": "postgres", 
+      "database.port": "5432", 
+      "database.user": "postgresuser", 
+      "database.password": "postgrespw", 
+      "database.dbname" : "inventory", 
+      "database.server.name": "inventory",
+      "topic.prefix": "inventory",
+      "time.precision.mode":"connect",
+      "schema.include.list": "inventory"
+    }
+}
