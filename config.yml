@@ -1,7 +1,7 @@
 kafka:
   # Brokers is a list of bootstrap servers with 
   # port (for example "localhost:9092").
-  brokers: ["broker:9092"]
+  brokers: ["broker1:9092","broker2:9092","broker3:9092"]
   # Client ID that the Kafka client can use to identify itself 
   # against the target Kafka cluster.
   clientId: console
@@ -60,7 +60,7 @@ kafka:
     passphrase: 
     insecureSkipTlsVerify: false
   schemaRegistry:
-    enabled: true
+    enabled: false
     # Url with scheme is required, e.g. ["http://localhost:8081"]
     urls: ["http://schema-registry:8081"] 
     # Basic auth username

@@ -1,45 +1,51 @@
 ---
 version: '2'
 services:
-  zookeeper:
+  zookeeper1:
     image: bitnami/zookeeper:3.5.6
-    hostname: zookeeper
+    hostname: zookeeper1
     ports:
       - "2181:2181"
     environment:
+      ZOO_SERVER_ID: 1
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOO_TICK_TIME: 2000
       ALLOW_ANONYMOUS_LOGIN: yes 
     volumes:
-      - ./zookeeper:/bitnami/zookeeper/
+      - ./zookeeper1:/bitnami/zookeeper/
+
+  zookeeper2:
+    image: bitnami/zookeeper:3.5.6
+    hostname: zookeeper2
+    environment:
+      ZOO_SERVER_ID: 2
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOO_TICK_TIME: 2000
+      ALLOW_ANONYMOUS_LOGIN: yes 
+    volumes:
+      - ./zookeeper2:/bitnami/zookeeper/
 
 
-  broker:
+  broker1:
     image: bitnami/kafka:2.4.0
-    hostname: broker
+    hostname: broker1
     depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-      - "9101:9101"
+      - zookeeper1
+      - zookeeper2
     volumes:
       - ./broker1:/bitnami/kafka/data
     environment:
       ALLOW_PLAINTEXT_LISTENER: yes
       KAFKA_BROKER_ID: 1
-      KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_LISTENERS: CLIENT://:29092,EXTERNAL://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: CLIENT://broker:29092,EXTERNAL://broker:9093
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: CLIENT
+      KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2181'
+      # KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      # KAFKA_CFG_LISTENERS: CLIENT://:29092,EXTERNAL://:9093
+      # KAFKA_CFG_ADVERTISED_LISTENERS: CLIENT://broker:29092,EXTERNAL://broker:9093
+      # KAFKA_CFG_INTER_BROKER_LISTENER_NAME: CLIENT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      # KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_JMX_PORT: 9101
-      KAFKA_JMX_HOSTNAME: localhost
       # KAFKA_JMX_OPTS: -agentlib:jdwp=transport=dt_socket,server=y,address=0.0.0.0:8000,suspend=n
 
   broker2:
@@ -47,24 +53,16 @@ services:
     hostname: broker2
     container_name: broker2
     depends_on:
-      - zookeeper
-    ports:
-      - "9094:9094"
-      - "9102:9102"
+      - zookeeper1
+      - zookeeper2
     volumes:
       - ./broker2:/bitnami/kafka/data
     environment:
       ALLOW_PLAINTEXT_LISTENER: yes
       KAFKA_BROKER_ID: 2
-      KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_LISTENERS: CLIENT://:29092,EXTERNAL://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: CLIENT://broker2:29092,EXTERNAL://broker2:9093
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: CLIENT
+      KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2181'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 1000
-      KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_JMX_PORT: 9102
@@ -75,35 +73,31 @@ services:
     hostname: broker3
     container_name: broker3
     depends_on:
-      - zookeeper
-    ports:
-      - "9095:9095"
-      - "9103:9103"
+      - zookeeper1
+      - zookeeper2
     volumes:
       - ./broker3:/bitnami/kafka/data
     environment:
       ALLOW_PLAINTEXT_LISTENER: yes
       KAFKA_BROKER_ID: 3
-      KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper:2181'
-      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: CLIENT:PLAINTEXT,EXTERNAL:PLAINTEXT
-      KAFKA_CFG_LISTENERS: CLIENT://:29092,EXTERNAL://:9093
-      KAFKA_CFG_ADVERTISED_LISTENERS: CLIENT://broker3:29092,EXTERNAL://broker3:9093
-      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: EXTERNAL
+      KAFKA_CFG_ZOOKEEPER_CONNECT: 'zookeeper1:2181,zookeeper2:2181'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      # KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_CONFLUENT_LICENSE_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CONFLUENT_BALANCER_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_JMX_PORT: 9102
-      KAFKA_JMX_HOSTNAME: localhost
 
   redpanda2:
     image: docker.redpanda.com/vectorized/console:latest
     ports:
       - 8082:8080
+    volumes:
+      - ./config.yml:/opt/config.yml
     environment:
-      - KAFKA_BROKERS=broker:9093,broker2:9093,broker3:9093
+      - KAFKA_BROKERS=broker:9092,broker2:9092,broker3:9092
+      - CONNECT_CLUSTER_URLS=http://connect:8083
+      - CONFIG_FILEPATH=/opt/config.yml
 
   postgres:
     image: quay.io/debezium/example-postgres:2.0.1.Final
@@ -125,19 +119,10 @@ services:
      - broker
      - postgres
     environment:
-     - BOOTSTRAP_SERVERS=broker:29092,broker2:29092,broker3:29092
+     - BOOTSTRAP_SERVERS=broker1:9092,broker2:9092,broker3:9092
      - GROUP_ID=1
      - CONFIG_STORAGE_TOPIC=my_connect_configs
      - OFFSET_STORAGE_TOPIC=my_connect_offsets
      - STATUS_STORAGE_TOPIC=my_source_connect_statuses
-
-
-volumes: 
-  tmpfs: 
-    # For details, see:
-    # https://docs.docker.com/engine/reference/commandline/volume_create/#driver-specific-options
-    driver: local
-    driver_opts:
-      o: "size=$TMPFS_SIZE"
-      device: tmpfs
-      type: tmpfs
+     - CONNECT__cleanup_policy=compact
+     - CONNECT__default_replication_factor=5
